@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
 
-import { getPet, listPets } from '@/features/pets/api'
+import { createPet, getPet, listPets } from '@/features/pets/api'
 
 export const petKeys = {
   all: ['pets'] as const,
@@ -14,4 +15,19 @@ export function usePets() {
 
 export function usePet(id: string) {
   return useQuery({ queryKey: petKeys.detail(id), queryFn: () => getPet(id), enabled: Boolean(id) })
+}
+
+/** Pet da rota atual (`/pets/:petId/...`). */
+export function useCurrentPet() {
+  const { petId = '' } = useParams()
+  return usePet(petId)
+}
+
+export function useCreatePet() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createPet,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: petKeys.all }),
+  })
 }
