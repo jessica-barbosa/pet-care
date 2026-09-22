@@ -27,13 +27,14 @@ App em http://localhost:5173
 src/
   app/          App.tsx (providers) e router.tsx (rotas)
   components/
-    layout/     AppLayout (sidebar + header)
-    ui/         Button, Card, Spinner, PageHeader
+    layout/     PetLayout (sidebar das secoes do pet)
+    ui/         Button, Card, Field, PageHeader, SectionPlaceholder, Spinner, MockBanner
   features/     Codigo por dominio
     auth/       AuthProvider, useAuth, ProtectedRoute
-    pets/       types.ts, api.ts (acesso a dados), queries.ts (hooks)
+    pets/       types.ts, api.ts (acesso a dados), queries.ts (hooks), components/PetAvatar
   lib/          env.ts, supabase.ts, queryClient.ts, utils.ts
-  pages/        Uma pagina por rota
+  pages/        Login, SelectPet, NewPet, NotFound
+    pet/        Secoes de dentro de um pet (visao geral, agenda, peso, ...)
   types/        database.ts (tipos gerados do Supabase)
 ```
 
@@ -41,23 +42,49 @@ Convencao: import absoluto com o alias `@/` (ex.: `import { Button } from '@/com
 
 Cada dominio novo segue o padrao de `features/pets`: `types.ts` (modelo) → `api.ts` (acesso a dados) → `queries.ts` (hooks React Query) → paginas consomem so os hooks.
 
-## Rotas
+## Navegacao
 
-| Rota          | Pagina          | Acesso   |
-| ------------- | --------------- | -------- |
-| `/login`      | LoginPage       | publica  |
-| `/`           | DashboardPage   | privada  |
-| `/pets`       | PetsPage        | privada  |
-| `/pets/:petId`| PetDetailPage   | privada  |
-| `/agenda`     | AgendaPage      | privada  |
-| `*`           | NotFoundPage    | publica  |
+O **pet e o "perfil"** da app: depois do login voce escolhe um pet (estilo seletor de
+perfis do Netflix) e todas as secoes vivem dentro do contexto dele.
+
+```
+/login  →  /  (seletor de pets)  →  /pets/:petId/...  (sidebar com as secoes)
+                  ↓
+              /pets/novo
+```
+
+| Rota                      | Pagina               | Layout            |
+| ------------------------- | -------------------- | ----------------- |
+| `/login`                  | LoginPage            | tela cheia        |
+| `/`                       | SelectPetPage        | tela cheia escura |
+| `/pets/novo`              | NewPetPage           | formulario        |
+| `/pets/:petId`            | PetOverviewPage      | PetLayout         |
+| `/pets/:petId/agenda`     | PetAgendaPage        | PetLayout         |
+| `/pets/:petId/peso`       | PetWeightPage        | PetLayout         |
+| `/pets/:petId/consultas`  | PetAppointmentsPage  | PetLayout         |
+| `/pets/:petId/vacinas`    | PetVaccinesPage      | PetLayout         |
+| `/pets/:petId/historico`  | PetHistoryPage       | PetLayout         |
+| `*`                       | NotFoundPage         | tela cheia        |
+
+Tudo fora de `/login` exige sessao (`ProtectedRoute`).
+
+### Adicionando uma secao nova ao pet
+
+1. Criar a pagina em `src/pages/pet/`.
+2. Adicionar a rota filha em `src/app/router.tsx`.
+3. Adicionar o item em `navItems` no `PetLayout`.
+
+As secoes ainda sem feature usam `SectionPlaceholder` — troque pelo conteudo real quando
+implementar. O avatar do pet usa a inicial do nome com uma cor derivada do `id`; quando
+`photoUrl` existir, a foto entra no lugar sem mexer no layout.
 
 ## Modo mock (estado atual)
 
 Sem as variaveis do Supabase definidas, `src/lib/supabase.ts` exporta `null` e a app roda inteira em mock:
 
 - login aceita qualquer e-mail/senha e guarda a sessao no `localStorage`;
-- `features/pets/api.ts` devolve uma lista fixa de pets;
+- `features/pets/api.ts` devolve uma lista fixa de pets, em memoria — pets cadastrados
+  aparecem na hora, mas somem ao recarregar a pagina;
 - uma faixa amarela no topo avisa que o Supabase nao esta configurado.
 
 ## Ligando o Supabase

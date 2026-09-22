@@ -1,12 +1,12 @@
-import type { Pet } from '@/features/pets/types'
+import type { NewPet, Pet } from '@/features/pets/types'
 import { supabase } from '@/lib/supabase'
 
 /**
  * Camada de acesso a dados dos pets.
  *
- * Hoje responde com dados mock. Quando a tabela `pets` existir no Supabase,
- * basta trocar o corpo de cada funcao pela query real — a assinatura e os
- * hooks de `queries.ts` continuam iguais. Exemplo:
+ * Hoje responde com dados mock em memoria. Quando a tabela `pets` existir no
+ * Supabase, basta trocar o corpo de cada funcao pela query real — a assinatura
+ * e os hooks de `queries.ts` continuam iguais. Exemplo:
  *
  *   const { data, error } = await requireSupabase().from('pets').select('*')
  *   if (error) throw error
@@ -47,12 +47,12 @@ const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
 export async function listPets(): Promise<Pet[]> {
   if (!supabase) {
     await delay()
-    return MOCK_PETS
+    return [...MOCK_PETS]
   }
 
   // TODO(supabase): const { data, error } = await supabase.from('pets').select('*')
   await delay()
-  return MOCK_PETS
+  return [...MOCK_PETS]
 }
 
 export async function getPet(id: string): Promise<Pet | null> {
@@ -64,4 +64,19 @@ export async function getPet(id: string): Promise<Pet | null> {
   // TODO(supabase): .from('pets').select('*').eq('id', id).maybeSingle()
   await delay()
   return MOCK_PETS.find((pet) => pet.id === id) ?? null
+}
+
+export async function createPet(input: NewPet): Promise<Pet> {
+  const pet: Pet = { ...input, id: crypto.randomUUID() }
+
+  if (!supabase) {
+    await delay(400)
+    MOCK_PETS.push(pet)
+    return pet
+  }
+
+  // TODO(supabase): .from('pets').insert(input).select().single()
+  await delay(400)
+  MOCK_PETS.push(pet)
+  return pet
 }
