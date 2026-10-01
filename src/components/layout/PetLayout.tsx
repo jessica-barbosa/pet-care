@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { MockBanner } from '@/components/ui/MockBanner'
 import { Spinner } from '@/components/ui/Spinner'
+import {
+  CalendarIcon,
+  ClockIcon,
+  HomeIcon,
+  PulseIcon,
+  ScaleIcon,
+  SyringeIcon,
+} from '@/components/ui/icons'
 import { useAuth } from '@/features/auth/useAuth'
 import { PetAvatar } from '@/features/pets/components/PetAvatar'
 import { useCurrentPet } from '@/features/pets/queries'
@@ -12,12 +20,12 @@ import { cn } from '@/lib/utils'
 
 /** Secoes do pet. Novas features entram aqui + em uma rota filha do router. */
 const navItems = [
-  { path: '', label: 'Visao geral', icon: '🏠' },
-  { path: 'agenda', label: 'Agenda', icon: '📅' },
-  { path: 'peso', label: 'Peso', icon: '⚖️' },
-  { path: 'consultas', label: 'Consultas', icon: '🩺' },
-  { path: 'vacinas', label: 'Vacinas', icon: '💉' },
-  { path: 'historico', label: 'Historico', icon: '📋' },
+  { path: '', label: 'Visao geral', Icon: HomeIcon },
+  { path: 'agenda', label: 'Agenda', Icon: CalendarIcon },
+  { path: 'peso', label: 'Peso', Icon: ScaleIcon },
+  { path: 'consultas', label: 'Consultas', Icon: PulseIcon },
+  { path: 'vacinas', label: 'Vacinas', Icon: SyringeIcon },
+  { path: 'historico', label: 'Historico', Icon: ClockIcon },
 ]
 
 export function PetLayout() {
@@ -83,7 +91,7 @@ export function PetLayout() {
                   )
                 }
               >
-                <span aria-hidden>{item.icon}</span>
+                <item.Icon />
                 {item.label}
               </NavLink>
             ))}
