@@ -11,7 +11,23 @@ body,
   height: 100%;
 }
 
+/*
+ * Reserva o espaco da barra de rolagem mesmo nas paginas que cabem na tela.
+ * Sem isso, ir de uma pagina curta (Agenda) para uma longa (Peso) faz a barra
+ * aparecer, o conteudo disponivel encolher 15px e o layout centralizado pular
+ * ~7px para a esquerda.
+ */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Fundo esmaecido do <dialog> (ver components/ui/Modal.tsx). */
+dialog::backdrop {
+  background-color: rgb(15 23 42 / 0.45); /* slate-900 */
+  backdrop-filter: blur(2px);
 }

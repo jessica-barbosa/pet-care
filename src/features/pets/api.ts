@@ -21,7 +21,7 @@ const MOCK_PETS: Pet[] = [
     breed: 'Golden Retriever',
     birthDate: '2021-03-14',
     ownerName: 'Ana Souza',
-    notes: 'Vacina antirrabica em dia.',
+    notes: 'Se estressa com barulho de fogos.',
   },
   {
     id: '2',
