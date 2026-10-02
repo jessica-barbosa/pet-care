@@ -1,19 +1,57 @@
-import type { Appointment, AppointmentUpdate, NewAppointment } from '@/features/appointments/types'
+import type {
+  Appointment,
+  AppointmentStatus,
+  AppointmentUpdate,
+  NewAppointment,
+} from '@/features/appointments/types'
 import { byDateTimeDesc } from '@/features/appointments/types'
 import { toDateInput } from '@/lib/date'
-import { supabase } from '@/lib/supabase'
+import { requireSupabase, supabase } from '@/lib/supabase'
+import type { Tables, TablesInsert } from '@/types/database'
 
 /**
  * Camada de acesso a dados das consultas.
  *
- * Hoje responde com dados mock em memoria. Quando a tabela `appointments` existir
- * no Supabase, basta trocar o corpo de cada funcao pela query real — a assinatura
- * e os hooks de `queries.ts` continuam iguais.
- *
- * Aqui existe `update` (nao existe em peso e vacina) porque a consulta e agendada
- * antes de acontecer: o desfecho e escrito depois. Continua sem delete — consulta
- * que nao aconteceu vira `cancelled`, e o registro fica.
+ * Unica tabela com UPDATE liberado na RLS: a consulta e agendada antes de
+ * acontecer e recebe o desfecho depois. Continua sem DELETE — consulta que nao
+ * aconteceu vira `cancelled`, e a linha fica.
  */
+
+function toAppointment(row: Tables<'appointments'>): Appointment {
+  return {
+    id: row.id,
+    petId: row.pet_id,
+    date: row.date,
+    // Postgres devolve `time` como "HH:MM:SS"; o <input type="time"> usa "HH:MM".
+    time: row.time ? row.time.slice(0, 5) : undefined,
+    reason: row.reason,
+    vet: row.vet ?? undefined,
+    clinic: row.clinic ?? undefined,
+    status: row.status as AppointmentStatus,
+    diagnosis: row.diagnosis ?? undefined,
+    prescription: row.prescription ?? undefined,
+    notes: row.notes ?? undefined,
+  }
+}
+
+function toRow(appointment: NewAppointment): TablesInsert<'appointments'> {
+  return {
+    pet_id: appointment.petId,
+    date: appointment.date,
+    time: appointment.time ?? null,
+    reason: appointment.reason,
+    vet: appointment.vet ?? null,
+    clinic: appointment.clinic ?? null,
+    status: appointment.status,
+    diagnosis: appointment.diagnosis ?? null,
+    prescription: appointment.prescription ?? null,
+    notes: appointment.notes ?? null,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mock (usado apenas sem Supabase configurado)
+// ---------------------------------------------------------------------------
 
 /** Datas relativas a hoje: dados fixos envelheceriam e esvaziariam as telas. */
 const daysFromNow = (days: number) => {
@@ -92,38 +130,66 @@ const MOCK_APPOINTMENTS: Appointment[] = [
 
 const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// ---------------------------------------------------------------------------
+
 export async function listAppointments(petId: string): Promise<Appointment[]> {
   if (!supabase) {
     await delay()
     return MOCK_APPOINTMENTS.filter((item) => item.petId === petId).sort(byDateTimeDesc)
   }
 
-  // TODO(supabase): .from('appointments').select('*').eq('pet_id', petId).order('date')
-  await delay()
-  return MOCK_APPOINTMENTS.filter((item) => item.petId === petId).sort(byDateTimeDesc)
+  const { data, error } = await requireSupabase()
+    .from('appointments')
+    .select('*')
+    .eq('pet_id', petId)
+    .order('date', { ascending: false })
+    .order('time', { ascending: false, nullsFirst: false })
+
+  if (error) throw error
+  return data.map(toAppointment)
 }
 
 export async function createAppointment(input: NewAppointment): Promise<Appointment> {
-  const appointment: Appointment = { ...input, id: crypto.randomUUID() }
-
   if (!supabase) {
     await delay(400)
+    const appointment: Appointment = { ...input, id: crypto.randomUUID() }
     MOCK_APPOINTMENTS.push(appointment)
     return appointment
   }
 
-  // TODO(supabase): .from('appointments').insert(input).select().single()
-  await delay(400)
-  MOCK_APPOINTMENTS.push(appointment)
-  return appointment
+  const { data, error } = await requireSupabase()
+    .from('appointments')
+    .insert(toRow(input))
+    .select()
+    .single()
+
+  if (error) throw error
+  return toAppointment(data)
 }
 
 export async function updateAppointment({ id, ...patch }: AppointmentUpdate) {
-  const index = MOCK_APPOINTMENTS.findIndex((item) => item.id === id)
-  if (index < 0) throw new Error(`Consulta ${id} nao encontrada`)
+  if (!supabase) {
+    await delay(400)
+    const index = MOCK_APPOINTMENTS.findIndex((item) => item.id === id)
+    if (index < 0) throw new Error(`Consulta ${id} nao encontrada`)
+    MOCK_APPOINTMENTS[index] = { ...MOCK_APPOINTMENTS[index], ...patch }
+    return MOCK_APPOINTMENTS[index]
+  }
 
-  // TODO(supabase): .from('appointments').update(patch).eq('id', id).select().single()
-  await delay(400)
-  MOCK_APPOINTMENTS[index] = { ...MOCK_APPOINTMENTS[index], ...patch }
-  return MOCK_APPOINTMENTS[index]
+  // Patch parcial: so os campos do desfecho. `undefined` vira null para limpar
+  // um campo que o usuario apagou ao editar.
+  const { data, error } = await requireSupabase()
+    .from('appointments')
+    .update({
+      ...(patch.status !== undefined && { status: patch.status }),
+      ...('diagnosis' in patch && { diagnosis: patch.diagnosis ?? null }),
+      ...('prescription' in patch && { prescription: patch.prescription ?? null }),
+      ...('notes' in patch && { notes: patch.notes ?? null }),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return toAppointment(data)
 }

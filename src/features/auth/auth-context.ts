@@ -12,6 +12,11 @@ export type AuthContextValue = {
   /** true quando a sessao vem de um mock local (Supabase ainda nao configurado). */
   isMock: boolean
   signIn: (email: string, password: string) => Promise<void>
+  /**
+   * `needsConfirmation` vem true quando o projeto exige confirmacao por e-mail:
+   * a conta foi criada mas ainda nao ha sessao.
+   */
+  signUp: (email: string, password: string) => Promise<{ needsConfirmation: boolean }>
   signOut: () => Promise<void>
 }
 

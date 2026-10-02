@@ -43,6 +43,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
   }, [])
 
+  const signUp = useCallback(async (email: string, password: string) => {
+    if (!supabase) {
+      // Sem backend nao ha o que cadastrar: a sessao mock ja aceita qualquer login.
+      const mockUser: AuthUser = { id: 'mock-user', email, name: email.split('@')[0] }
+      localStorage.setItem(MOCK_SESSION_KEY, JSON.stringify(mockUser))
+      setUser(mockUser)
+      return { needsConfirmation: false }
+    }
+
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+
+    // Com "Confirm email" ligado o Supabase cria a conta sem sessao — quem chamou
+    // precisa avisar para conferir o e-mail em vez de tentar navegar.
+    return { needsConfirmation: data.session === null }
+  }, [])
+
   const signOut = useCallback(async () => {
     if (!supabase) {
       localStorage.removeItem(MOCK_SESSION_KEY)
@@ -55,8 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ user, loading, isMock: !isSupabaseConfigured, signIn, signOut }),
-    [user, loading, signIn, signOut],
+    () => ({ user, loading, isMock: !isSupabaseConfigured, signIn, signUp, signOut }),
+    [user, loading, signIn, signUp, signOut],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
