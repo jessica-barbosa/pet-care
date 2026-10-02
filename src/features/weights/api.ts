@@ -1,19 +1,40 @@
 import type { NewWeightEntry, WeightEntry } from '@/features/weights/types'
-import { supabase } from '@/lib/supabase'
 import { toDateInput } from '@/lib/date'
+import { requireSupabase, supabase } from '@/lib/supabase'
+import type { Tables, TablesInsert } from '@/types/database'
 
 /**
  * Camada de acesso a dados das pesagens.
  *
- * Hoje responde com dados mock em memoria. Quando a tabela `weights` existir no
- * Supabase, basta trocar o corpo de cada funcao pela query real — a assinatura
- * e os hooks de `queries.ts` continuam iguais. Exemplo:
+ * Pesagem e dado historico: nao existe update nem delete, nem aqui nem no banco
+ * (as policies de RLS so concedem SELECT e INSERT). Se um dia precisar corrigir
+ * um lancamento, a afordancia certa e editar — e isso exige migration explicita.
  *
- *   const { data, error } = await requireSupabase()
- *     .from('weights').select('*').eq('pet_id', petId).order('date', { ascending: false })
- *   if (error) throw error
- *   return data
+ * `weight_kg` e `numeric` no Postgres; o supabase-js devolve number.
  */
+
+function toEntry(row: Tables<'weights'>): WeightEntry {
+  return {
+    id: row.id,
+    petId: row.pet_id,
+    date: row.date,
+    weightKg: Number(row.weight_kg),
+    notes: row.notes ?? undefined,
+  }
+}
+
+function toRow(entry: NewWeightEntry): TablesInsert<'weights'> {
+  return {
+    pet_id: entry.petId,
+    date: entry.date,
+    weight_kg: entry.weightKg,
+    notes: entry.notes ?? null,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mock (usado apenas sem Supabase configurado)
+// ---------------------------------------------------------------------------
 
 /** Datas relativas a hoje: dados fixos envelheceriam e esvaziariam as telas. */
 const daysAgo = (days: number) => {
@@ -53,33 +74,38 @@ const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
 /** Mais recente primeiro. */
 const byDateDesc = (a: WeightEntry, b: WeightEntry) => b.date.localeCompare(a.date)
 
+// ---------------------------------------------------------------------------
+
 export async function listWeights(petId: string): Promise<WeightEntry[]> {
   if (!supabase) {
     await delay()
     return MOCK_WEIGHTS.filter((entry) => entry.petId === petId).sort(byDateDesc)
   }
 
-  // TODO(supabase): .from('weights').select('*').eq('pet_id', petId).order('date')
-  await delay()
-  return MOCK_WEIGHTS.filter((entry) => entry.petId === petId).sort(byDateDesc)
+  const { data, error } = await requireSupabase()
+    .from('weights')
+    .select('*')
+    .eq('pet_id', petId)
+    .order('date', { ascending: false })
+
+  if (error) throw error
+  return data.map(toEntry)
 }
 
 export async function createWeight(input: NewWeightEntry): Promise<WeightEntry> {
-  const entry: WeightEntry = { ...input, id: crypto.randomUUID() }
-
   if (!supabase) {
     await delay(400)
+    const entry: WeightEntry = { ...input, id: crypto.randomUUID() }
     MOCK_WEIGHTS.push(entry)
     return entry
   }
 
-  // TODO(supabase): .from('weights').insert(input).select().single()
-  await delay(400)
-  MOCK_WEIGHTS.push(entry)
-  return entry
-}
+  const { data, error } = await requireSupabase()
+    .from('weights')
+    .insert(toRow(input))
+    .select()
+    .single()
 
-/**
- * Pesagem e dado historico: nao existe delete por decisao de produto (25/09/2026).
- * Se precisar corrigir um lancamento errado, a afordancia certa e editar, nao remover.
- */
+  if (error) throw error
+  return toEntry(data)
+}

@@ -25,6 +25,22 @@ export function today(): string {
   return toDateInput(new Date())
 }
 
+/** Quantos dias tem o mes (`monthIndex` de 0 a 11, como no `Date`). */
+export function daysInMonth(year: number, monthIndex: number): number {
+  // Dia 0 do mes seguinte e o ultimo dia deste.
+  return new Date(year, monthIndex + 1, 0).getDate()
+}
+
+/** Dia da semana do dia 1 do mes (0 = domingo) — quantas celulas vazias vem antes. */
+export function firstWeekday(year: number, monthIndex: number): number {
+  return new Date(year, monthIndex, 1).getDay()
+}
+
+/** `YYYY-MM-DD` montado por componente, sempre no fuso local. */
+export function dateKey(year: number, monthIndex: number, day: number): string {
+  return toDateInput(new Date(year, monthIndex, day))
+}
+
 /** Diferenca em dias inteiros entre duas datas `YYYY-MM-DD` (negativa no passado). */
 export function daysBetween(from: string, to: string): number {
   const MS_PER_DAY = 86_400_000
