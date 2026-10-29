@@ -40,7 +40,7 @@ export default function SelectPetPage() {
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 pb-20">
         <h1 className="mb-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Quem vamos cuidar hoje?
+          De quem vamos cuidar hoje?
         </h1>
         <p className="mb-12 text-sm text-slate-400">Escolha um pet para ver a rotina dele.</p>
 

@@ -26,6 +26,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * O Tailwind v4 parou de pintar a maozinha nos botoes (o preflight deixa `cursor:
+ * default`, como se fossem texto). Sem isto nenhum botao do app parece clicavel ao
+ * passar o mouse — so os links, que o navegador ja trata como clicaveis.
+ *
+ * `:not(:disabled)` mantem o botao desabilitado sem a mao (o componente Button ainda
+ * poe `not-allowed` por cima, via utilitario, que tem prioridade sobre esta camada).
+ * De proposito NAO inclui `[role=button]`: os alvos de hover do grafico de peso usam
+ * esse papel so por acessibilidade, nao sao clicaveis.
+ */
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* Fundo esmaecido do <dialog> (ver components/ui/Modal.tsx). */
 dialog::backdrop {
   background-color: rgb(15 23 42 / 0.45); /* slate-900 */
