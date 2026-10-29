@@ -98,7 +98,7 @@ export default function NewPetPage() {
             </Field>
 
             {createPet.isError && (
-              <p className="text-sm text-red-600">Nao foi possivel salvar o pet.</p>
+              <p className="text-sm text-red-600">Não foi possível salvar o pet.</p>
             )}
 
             <div className="mt-2 flex justify-end gap-2">

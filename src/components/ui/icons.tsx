@@ -78,6 +78,15 @@ export function SyringeIcon(props: IconProps) {
   )
 }
 
+export function CameraIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 8h2.5l1.4-2h8.2l1.4 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </Icon>
+  )
+}
+
 /** Relogio — historico. */
 export function ClockIcon(props: IconProps) {
   return (

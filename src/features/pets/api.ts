@@ -75,6 +75,21 @@ const MOCK_PETS: Pet[] = [
 
 const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
 
+/**
+ * Troca o pet do mock por uma COPIA com o patch aplicado, nunca altera o objeto.
+ * O React Query decide se re-renderiza comparando referencias: mutar no lugar faz
+ * a consulta devolver o mesmo objeto de antes, e telas que nao re-renderizaram por
+ * outro motivo ficam mostrando o dado velho. O banco real devolve objetos novos a
+ * cada consulta, entao o mock precisa se comportar igual.
+ */
+function replaceMockPet(id: string, patch: Partial<Pet>): Pet {
+  const index = MOCK_PETS.findIndex((item) => item.id === id)
+  if (index < 0) throw new Error(`Pet ${id} nao encontrado`)
+
+  MOCK_PETS[index] = { ...MOCK_PETS[index], ...patch }
+  return MOCK_PETS[index]
+}
+
 // ---------------------------------------------------------------------------
 
 export async function listPets(): Promise<Pet[]> {
@@ -125,5 +140,101 @@ export async function createPet(input: NewPet): Promise<Pet> {
     .single()
 
   if (error) throw error
+  return toPet(data)
+}
+
+// ---------------------------------------------------------------------------
+// Foto
+// ---------------------------------------------------------------------------
+
+const PHOTO_BUCKET = 'pet-photos'
+
+/**
+ * O banco guarda a URL publica, entao descobrir o arquivo para apagar e o caminho
+ * inverso: tudo que vem depois de `/pet-photos/`. URL que nao e do nosso bucket
+ * (ex.: um valor antigo digitado a mao) devolve null e simplesmente nao e apagada.
+ */
+function pathFromPublicUrl(url: string): string | null {
+  const marker = `/${PHOTO_BUCKET}/`
+  const index = url.indexOf(marker)
+  return index === -1 ? null : decodeURIComponent(url.slice(index + marker.length))
+}
+
+/** Apaga o arquivo antigo; falha aqui nao pode desfazer a troca, que ja deu certo. */
+async function removeStoredPhoto(photoUrl: string | undefined) {
+  const path = photoUrl ? pathFromPublicUrl(photoUrl) : null
+  if (!path) return
+
+  const { error } = await requireSupabase().storage.from(PHOTO_BUCKET).remove([path])
+  if (error) console.warn('Não foi possível apagar a foto antiga:', error.message)
+}
+
+/**
+ * Troca a foto do pet.
+ *
+ * Ordem importa: sobe o arquivo novo, aponta o pet para ele e SO ENTAO apaga o
+ * antigo. Se o upload falhar, o pet continua com a foto que tinha; se o update do
+ * banco falhar, o arquivo recem-enviado e removido para nao virar lixo no bucket.
+ *
+ * Cada envio usa um nome novo (uuid) — nunca sobrescreve — o que dispensa
+ * `upsert` e evita a foto antiga presa no cache do navegador/CDN.
+ *
+ * Caminho: `pets/{pet_id}-{uuid}.webp`, direto na pasta `pets/`. A policy de Storage
+ * (migration 0003) le o id do pet nos primeiros 36 caracteres do NOME do arquivo e
+ * confere na tabela `pets` se e um pet do usuario logado — o id do dono nao precisa
+ * aparecer no caminho. O prefixo precisa continuar sendo exatamente o id do pet.
+ */
+export async function setPetPhoto(pet: Pet, photo: Blob, extension: string): Promise<Pet> {
+  if (!supabase) {
+    await delay(400)
+    return replaceMockPet(pet.id, { photoUrl: URL.createObjectURL(photo) })
+  }
+
+  const client = requireSupabase()
+
+  const path = `pets/${pet.id}-${crypto.randomUUID()}.${extension}`
+
+  const upload = await client.storage.from(PHOTO_BUCKET).upload(path, photo, {
+    contentType: photo.type,
+    // Nome unico => o conteudo nunca muda, entao o cache pode durar um ano.
+    cacheControl: '31536000',
+  })
+  if (upload.error) throw upload.error
+
+  const photoUrl = client.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl
+
+  const { data, error } = await client
+    .from('pets')
+    .update({ photo_url: photoUrl })
+    .eq('id', pet.id)
+    .select()
+    .single()
+
+  if (error) {
+    await client.storage.from(PHOTO_BUCKET).remove([path])
+    throw error
+  }
+
+  await removeStoredPhoto(pet.photoUrl)
+  return toPet(data)
+}
+
+/** Volta o pet para o avatar de inicial e apaga o arquivo. */
+export async function clearPetPhoto(pet: Pet): Promise<Pet> {
+  if (!supabase) {
+    await delay(300)
+    return replaceMockPet(pet.id, { photoUrl: undefined })
+  }
+
+  const { data, error } = await requireSupabase()
+    .from('pets')
+    .update({ photo_url: null })
+    .eq('id', pet.id)
+    .select()
+    .single()
+
+  if (error) throw error
+
+  await removeStoredPhoto(pet.photoUrl)
   return toPet(data)
 }

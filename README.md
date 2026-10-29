@@ -132,6 +132,33 @@ As regras de produto estao no banco, nao so na interface: `weights` e `vaccines`
 policy apenas de SELECT e INSERT (registro historico nao se altera), e `appointments`
 ganha UPDATE porque recebe o desfecho depois — nenhuma das tres aceita DELETE.
 
+### Fotos dos pets (Storage)
+
+A foto vai para o bucket `pet-photos` do Supabase Storage — migration
+[`0002_pet_photos.sql`](supabase/migrations/0002_pet_photos.sql), que precisa rodar **antes**
+de publicar o codigo da feature (sem o bucket o upload falha).
+
+- O navegador recorta o centro em quadrado e reduz para 512 px em WebP antes de enviar
+  (`src/lib/image.ts`): ~50 KB por foto em vez de varios MB.
+- O caminho e `pets/{pet_id}-{uuid}.webp`, tudo direto na pasta `pets/`. As policies
+  (migration [`0003`](supabase/migrations/0003_pet_photos_layout.sql), que substitui as da
+  `0002`) leem o id do pet nos 36 primeiros caracteres do nome do arquivo e conferem na
+  tabela `pets` se ele e do usuario logado — o id do dono nao precisa estar no caminho.
+  Rodar as tres migrations em ordem num ambiente novo.
+- Bucket **publico** com caminho nao adivinhavel: a foto abre por `<img src>` e e cacheada
+  pela CDN, mas ninguem consegue listar o bucket. Se um dia precisar de privacidade real,
+  vira bucket privado + URLs assinadas — troca localizada em `features/pets/api.ts`.
+- Cada envio usa um nome novo e o arquivo antigo e apagado depois: nada de foto velha presa
+  no cache.
+
+### Deploy (Vercel)
+
+Preset Vite, sem Dockerfile — a app e um bundle estatico. `vercel.json` reescreve todas as
+rotas para o `index.html` (roteamento no cliente). As duas variaveis `VITE_SUPABASE_*`
+precisam estar no painel do Vercel; elas sao embutidas **no build**, entao alterar uma exige
+um novo deploy. Migrations de banco **nao** rodam sozinhas no deploy: aplicar no Supabase
+antes de mergear codigo que dependa delas.
+
 ### Tipos
 
 `src/types/database.ts` foi escrito a mao a partir da migration. Depois de qualquer
