@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/Button'
@@ -6,6 +7,7 @@ import { MockBanner } from '@/components/ui/MockBanner'
 import { Spinner } from '@/components/ui/Spinner'
 import {
   CalendarIcon,
+  CameraIcon,
   ClockIcon,
   HomeIcon,
   PulseIcon,
@@ -14,6 +16,7 @@ import {
 } from '@/components/ui/icons'
 import { useAuth } from '@/features/auth/useAuth'
 import { PetAvatar } from '@/features/pets/components/PetAvatar'
+import { PetPhotoModal } from '@/features/pets/components/PetPhotoModal'
 import { useCurrentPet } from '@/features/pets/queries'
 import { speciesLabel } from '@/features/pets/types'
 import { cn } from '@/lib/utils'
@@ -32,6 +35,8 @@ export function PetLayout() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const { data: pet, isLoading } = useCurrentPet()
+  // Antes dos early returns: hook nao pode ficar depois de um `return` condicional.
+  const [isPhotoOpen, setPhotoOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -61,7 +66,25 @@ export function PetLayout() {
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 md:flex-row">
         <aside className="shrink-0 md:w-60">
           <div className="flex items-center gap-3 md:flex-col md:items-start">
-            <PetAvatar pet={pet} size="md" />
+            <button
+              type="button"
+              onClick={() => setPhotoOpen(true)}
+              aria-label={`Alterar foto de ${pet.name}`}
+              className="group relative shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            >
+              <PetAvatar
+                pet={pet}
+                size="md"
+                className="transition-opacity group-hover:opacity-80"
+              />
+              {/* Sempre visivel: no celular nao existe hover para revelar a acao. */}
+              <span
+                aria-hidden
+                className="absolute -top-0.5 -right-0.5 flex size-6 items-center justify-center rounded-full bg-teal-600 text-white shadow-sm ring-2 ring-slate-50"
+              >
+                <CameraIcon className="size-3.5" />
+              </span>
+            </button>
             <div className="min-w-0">
               <p className="truncate text-lg font-semibold">{pet.name}</p>
               <p className="text-xs text-slate-500">
@@ -109,6 +132,8 @@ export function PetLayout() {
           <main>
             <Outlet />
           </main>
+
+          <PetPhotoModal pet={pet} open={isPhotoOpen} onClose={() => setPhotoOpen(false)} />
         </div>
       </div>
     </div>

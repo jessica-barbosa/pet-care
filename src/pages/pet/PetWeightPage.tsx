@@ -108,7 +108,7 @@ export default function PetWeightPage() {
           </div>
 
           {createWeight.isError && (
-            <p className="text-sm text-red-600 sm:col-span-2">Nao foi possivel salvar a pesagem.</p>
+            <p className="text-sm text-red-600 sm:col-span-2">Não foi possível salvar a pesagem.</p>
           )}
 
           <div className="flex justify-end gap-2 sm:col-span-2">

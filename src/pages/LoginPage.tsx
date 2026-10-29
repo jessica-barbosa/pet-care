@@ -56,7 +56,7 @@ export default function LoginPage() {
 
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nao foi possivel continuar')
+      setError(err instanceof Error ? err.message : 'Não foi possível continuar')
     } finally {
       setSubmitting(false)
     }

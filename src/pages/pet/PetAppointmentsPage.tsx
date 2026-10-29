@@ -219,7 +219,7 @@ export default function PetAppointmentsPage() {
 
           {createAppointment.isError && (
             <p className="text-sm text-red-600 sm:col-span-2">
-              Nao foi possivel salvar a consulta.
+              Não foi possível salvar a consulta.
             </p>
           )}
 
@@ -265,7 +265,7 @@ export default function PetAppointmentsPage() {
           </Field>
 
           {updateAppointment.isError && (
-            <p className="text-sm text-red-600">Nao foi possivel salvar o atendimento.</p>
+            <p className="text-sm text-red-600">Não foi possível salvar o atendimento.</p>
           )}
 
           <div className="flex justify-end gap-2">

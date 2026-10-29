@@ -45,7 +45,7 @@ export default function SelectPetPage() {
         <p className="mb-12 text-sm text-slate-400">Escolha um pet para ver a rotina dele.</p>
 
         {isLoading && <Spinner className="border-slate-600 border-t-teal-400" />}
-        {error && <p className="text-sm text-red-400">Nao foi possivel carregar os pets.</p>}
+        {error && <p className="text-sm text-red-400">Não foi possível carregar os pets.</p>}
 
         {pets && (
           <ul className="flex flex-wrap items-start justify-center gap-8 sm:gap-12">
