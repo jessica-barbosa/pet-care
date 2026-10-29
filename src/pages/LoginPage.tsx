@@ -80,6 +80,11 @@ export default function LoginPage() {
               type="email"
               required
               autoComplete="email"
+              // E-mail nao e texto de dicionario: sem isso o celular sublinha pedacos
+              // do endereco e abre o menu de sugestoes por cima do formulario.
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="none"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className={inputClass}

@@ -138,8 +138,10 @@ A foto vai para o bucket `pet-photos` do Supabase Storage — migration
 [`0002_pet_photos.sql`](supabase/migrations/0002_pet_photos.sql), que precisa rodar **antes**
 de publicar o codigo da feature (sem o bucket o upload falha).
 
-- O navegador recorta o centro em quadrado e reduz para 512 px em WebP antes de enviar
-  (`src/lib/image.ts`): ~50 KB por foto em vez de varios MB.
+- O usuario enquadra a foto antes de salvar (arrastar, zoom por controle, roda do mouse,
+  pinca no touch e teclado — sem biblioteca, em `PhotoCropper`). O navegador recorta
+  exatamente aquele quadrado e reduz para 512 px em WebP (`src/lib/image.ts`): ~50 KB por
+  foto em vez de varios MB. O preview e o arquivo final usam a mesma funcao de desenho.
 - O caminho e `pets/{pet_id}-{uuid}.webp`, tudo direto na pasta `pets/`. As policies
   (migration [`0003`](supabase/migrations/0003_pet_photos_layout.sql), que substitui as da
   `0002`) leem o id do pet nos 36 primeiros caracteres do nome do arquivo e conferem na

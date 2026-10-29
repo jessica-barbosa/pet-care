@@ -70,6 +70,7 @@ export function PetLayout() {
               type="button"
               onClick={() => setPhotoOpen(true)}
               aria-label={`Alterar foto de ${pet.name}`}
+              title="Alterar foto"
               className="group relative shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
             >
               <PetAvatar
@@ -80,7 +81,7 @@ export function PetLayout() {
               {/* Sempre visivel: no celular nao existe hover para revelar a acao. */}
               <span
                 aria-hidden
-                className="absolute -top-0.5 -right-0.5 flex size-6 items-center justify-center rounded-full bg-teal-600 text-white shadow-sm ring-2 ring-slate-50"
+                className="absolute -top-0.5 -right-0.5 flex size-6 items-center justify-center rounded-full bg-teal-600 text-white shadow-sm ring-2 ring-slate-50 transition-colors group-hover:bg-teal-700"
               >
                 <CameraIcon className="size-3.5" />
               </span>
