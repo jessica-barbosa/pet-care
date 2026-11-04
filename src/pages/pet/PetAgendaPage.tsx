@@ -20,7 +20,7 @@ import { cn, formatDate } from '@/lib/utils'
 
 const UPCOMING_LIMIT = 5
 
-const kinds: EventKind[] = ['appointment', 'vaccine', 'weight']
+const kinds: EventKind[] = ['appointment', 'vaccine', 'medication', 'exam', 'weight']
 
 /** "Outubro de 2026" */
 function monthTitle(year: number, month: number): string {
@@ -46,7 +46,7 @@ function EventRow({ event }: { event: TimelineEvent }) {
           </span>
           <span className="text-xs text-slate-400">
             {formatDate(event.date)}
-            {event.time ? ` as ${event.time}` : ''}
+            {event.time ? ` às ${event.time}` : ''}
           </span>
         </div>
         <Link
@@ -123,7 +123,7 @@ export default function PetAgendaPage() {
     <>
       <PageHeader
         title="Agenda"
-        description="Consultas, reforcos de vacina e pesagens no calendario. Os compromissos sao criados nas secoes de origem."
+        description="Consultas, preventivos, medicamentos, exames e pesagens no calendário. Os compromissos são criados nas seções de origem."
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -133,7 +133,7 @@ export default function PetAgendaPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Mes anterior"
+                aria-label="Mês anterior"
                 onClick={() => shiftMonth(-1)}
               >
                 ‹
@@ -144,7 +144,7 @@ export default function PetAgendaPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Proximo mes"
+                aria-label="Próximo mês"
                 onClick={() => shiftMonth(1)}
               >
                 ›
@@ -198,10 +198,10 @@ export default function PetAgendaPage() {
           </Card>
 
           <Card>
-            <CardTitle>Proximos</CardTitle>
+            <CardTitle>Próximos</CardTitle>
             {upcoming.length === 0 ? (
               <p className="mt-2 text-sm text-slate-500">
-                Nada marcado daqui para frente. Consultas e reforcos de vacina aparecem aqui.
+                Nada marcado daqui para frente. Consultas, preventivos e medicamentos aparecem aqui.
               </p>
             ) : (
               <ul className="mt-1 divide-y divide-slate-100">

@@ -25,7 +25,7 @@ export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
 export function requireSupabase(): SupabaseClient<Database> {
   if (!supabase) {
     throw new Error(
-      'Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY em .env.local',
+      'Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY em .env.local',
     )
   }
   return supabase

@@ -17,7 +17,7 @@ export type NewPet = Omit<Pet, 'id'>
 export const speciesLabel: Record<PetSpecies, string> = {
   dog: 'Cachorro',
   cat: 'Gato',
-  bird: 'Passaro',
+  bird: 'Pássaro',
   other: 'Outro',
 }
 

@@ -93,7 +93,7 @@ export default function LoginPage() {
 
           <Field
             label="Senha"
-            hint={mode === 'signup' ? `Minimo de ${MIN_PASSWORD} caracteres` : undefined}
+            hint={mode === 'signup' ? `Mínimo de ${MIN_PASSWORD} caracteres` : undefined}
           >
             <input
               type="password"
@@ -121,7 +121,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-4 text-sm text-slate-500">
-          {mode === 'signin' ? 'Ainda nao tem conta?' : 'Ja tem conta?'}{' '}
+          {mode === 'signin' ? 'Ainda não tem conta?' : 'Já tem conta?'}{' '}
           <button
             type="button"
             onClick={() => switchMode(mode === 'signin' ? 'signup' : 'signin')}
@@ -133,7 +133,7 @@ export default function LoginPage() {
 
         {isMock && (
           <p className="mt-4 text-xs text-slate-500">
-            Supabase nao configurado: qualquer e-mail/senha cria uma sessao local de teste.
+            Supabase não configurado: qualquer e-mail/senha cria uma sessão local de teste.
           </p>
         )}
       </Card>

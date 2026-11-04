@@ -127,7 +127,7 @@ export default function PetAppointmentsPage() {
     <>
       <PageHeader
         title="Consultas"
-        description="Atendimentos veterinarios do pet."
+        description="Atendimentos veterinários do pet."
         actions={<Button onClick={() => setCreateOpen(true)}>Nova consulta</Button>}
       />
 
@@ -140,7 +140,7 @@ export default function PetAppointmentsPage() {
         description={
           isLogging
             ? 'Data no passado: a consulta entra como realizada.'
-            : 'Data no futuro: a consulta entra como agendada e voce preenche o desfecho depois.'
+            : 'Data no futuro: a consulta entra como agendada e você preenche o desfecho depois.'
         }
       >
         <form onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2">
@@ -154,7 +154,7 @@ export default function PetAppointmentsPage() {
             />
           </Field>
 
-          <Field label="Horario" hint="Opcional">
+          <Field label="Horário" hint="Opcional">
             <input
               type="time"
               value={time}
@@ -175,7 +175,7 @@ export default function PetAppointmentsPage() {
             </Field>
           </div>
 
-          <Field label="Veterinario" hint="Opcional">
+          <Field label="Veterinário" hint="Opcional">
             <input
               value={vet}
               onChange={(event) => setVet(event.target.value)}
@@ -183,7 +183,7 @@ export default function PetAppointmentsPage() {
             />
           </Field>
 
-          <Field label="Clinica" hint="Opcional">
+          <Field label="Clínica" hint="Opcional">
             <input
               value={clinic}
               onChange={(event) => setClinic(event.target.value)}
@@ -194,7 +194,7 @@ export default function PetAppointmentsPage() {
           {isLogging && (
             <>
               <div className="sm:col-span-2">
-                <Field label="Diagnostico" hint="Opcional">
+                <Field label="Diagnóstico" hint="Opcional">
                   <textarea
                     rows={2}
                     value={diagnosis}
@@ -205,7 +205,7 @@ export default function PetAppointmentsPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <Field label="Prescricao" hint="Opcional">
+                <Field label="Prescrição" hint="Opcional">
                   <textarea
                     rows={2}
                     value={prescription}
@@ -245,7 +245,7 @@ export default function PetAppointmentsPage() {
         }
       >
         <form onSubmit={handleOutcome} className="grid gap-4">
-          <Field label="Diagnostico" hint="Opcional">
+          <Field label="Diagnóstico" hint="Opcional">
             <textarea
               rows={3}
               autoFocus
@@ -255,7 +255,7 @@ export default function PetAppointmentsPage() {
             />
           </Field>
 
-          <Field label="Prescricao" hint="Opcional">
+          <Field label="Prescrição" hint="Opcional">
             <textarea
               rows={3}
               value={prescription}
@@ -290,7 +290,7 @@ export default function PetAppointmentsPage() {
         }
       >
         <p className="text-sm text-slate-600">
-          A consulta fica marcada como cancelada e continua no historico — nada e apagado.
+          A consulta fica marcada como cancelada e continua no histórico — nada é apagado.
         </p>
 
         <div className="mt-5 flex justify-end gap-2">
@@ -307,21 +307,21 @@ export default function PetAppointmentsPage() {
         <Card className="max-w-2xl">
           <p className="text-sm font-medium text-slate-700">Nenhuma consulta registrada</p>
           <p className="mt-1 text-sm text-slate-500">
-            Agende a proxima consulta ou registre uma que ja aconteceu.
+            Agende a próxima consulta ou registre uma que já aconteceu.
           </p>
         </Card>
       ) : (
         <div className="grid gap-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
-              <CardTitle>Proxima consulta</CardTitle>
+              <CardTitle>Próxima consulta</CardTitle>
               <p className="mt-2 text-2xl font-semibold text-teal-700">
                 {next ? formatDate(next.date) : '—'}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 {next
                   ? next.time
-                    ? `as ${next.time} · ${next.reason}`
+                    ? `às ${next.time} · ${next.reason}`
                     : next.reason
                   : 'nada agendado'}
               </p>
@@ -336,7 +336,7 @@ export default function PetAppointmentsPage() {
             <Card>
               <CardTitle>Realizadas</CardTitle>
               <p className="mt-2 text-3xl font-semibold text-slate-900">{doneCount}</p>
-              <p className="mt-1 text-xs text-slate-500">atendimento(s) concluido(s)</p>
+              <p className="mt-1 text-xs text-slate-500">atendimento(s) concluído(s)</p>
             </Card>
           </div>
 
@@ -366,7 +366,7 @@ export default function PetAppointmentsPage() {
                           Registrar atendimento
                         </Button>
                       ) : (
-                        <span className="text-xs text-slate-400">ainda nao aconteceu</span>
+                        <span className="text-xs text-slate-400">ainda não aconteceu</span>
                       )}
                       <Button variant="ghost" size="sm" onClick={() => setCancelTarget(item)}>
                         Cancelar
@@ -380,7 +380,7 @@ export default function PetAppointmentsPage() {
 
           {past.length > 0 && (
             <Card>
-              <CardTitle>Historico</CardTitle>
+              <CardTitle>Histórico</CardTitle>
               <ul className="mt-3 flex flex-col divide-y divide-slate-100">
                 {past.map((item) => (
                   <li key={item.id} className="py-3">
@@ -399,19 +399,19 @@ export default function PetAppointmentsPage() {
                       <dl className="mt-2 grid gap-1 text-sm">
                         {item.diagnosis && (
                           <div className="flex gap-2">
-                            <dt className="shrink-0 text-slate-500">Diagnostico:</dt>
+                            <dt className="shrink-0 text-slate-500">Diagnóstico:</dt>
                             <dd className="text-slate-700">{item.diagnosis}</dd>
                           </div>
                         )}
                         {item.prescription && (
                           <div className="flex gap-2">
-                            <dt className="shrink-0 text-slate-500">Prescricao:</dt>
+                            <dt className="shrink-0 text-slate-500">Prescrição:</dt>
                             <dd className="text-slate-700">{item.prescription}</dd>
                           </div>
                         )}
                         {item.notes && (
                           <div className="flex gap-2">
-                            <dt className="shrink-0 text-slate-500">Observacoes:</dt>
+                            <dt className="shrink-0 text-slate-500">Observações:</dt>
                             <dd className="text-slate-700">{item.notes}</dd>
                           </div>
                         )}

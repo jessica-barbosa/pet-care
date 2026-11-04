@@ -9,7 +9,9 @@ import {
   CalendarIcon,
   CameraIcon,
   ClockIcon,
+  FileIcon,
   HomeIcon,
+  PillIcon,
   PulseIcon,
   ScaleIcon,
   SyringeIcon,
@@ -23,12 +25,14 @@ import { cn } from '@/lib/utils'
 
 /** Secoes do pet. Novas features entram aqui + em uma rota filha do router. */
 const navItems = [
-  { path: '', label: 'Visao geral', Icon: HomeIcon },
+  { path: '', label: 'Visão geral', Icon: HomeIcon },
   { path: 'agenda', label: 'Agenda', Icon: CalendarIcon },
   { path: 'peso', label: 'Peso', Icon: ScaleIcon },
   { path: 'consultas', label: 'Consultas', Icon: PulseIcon },
-  { path: 'vacinas', label: 'Vacinas', Icon: SyringeIcon },
-  { path: 'historico', label: 'Historico', Icon: ClockIcon },
+  { path: 'vacinas', label: 'Preventivos', Icon: SyringeIcon },
+  { path: 'medicamentos', label: 'Medicamentos', Icon: PillIcon },
+  { path: 'exames', label: 'Exames', Icon: FileIcon },
+  { path: 'historico', label: 'Histórico', Icon: ClockIcon },
 ]
 
 export function PetLayout() {
@@ -50,7 +54,7 @@ export function PetLayout() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
         <Card className="max-w-sm text-center">
-          <p className="text-sm text-slate-600">Pet nao encontrado.</p>
+          <p className="text-sm text-slate-600">Pet não encontrado.</p>
           <Button variant="secondary" size="sm" className="mt-3" onClick={() => navigate('/')}>
             Escolher outro pet
           </Button>

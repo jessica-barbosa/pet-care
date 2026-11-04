@@ -43,5 +43,5 @@ export const byDateTimeDesc = (a: Appointment, b: Appointment) => byDateTimeAsc(
 
 /** "12 de out. de 2026 as 10:30" — o horario so aparece quando existe. */
 export function describeWhen(appointment: Appointment, formattedDate: string): string {
-  return appointment.time ? `${formattedDate} as ${appointment.time}` : formattedDate
+  return appointment.time ? `${formattedDate} às ${appointment.time}` : formattedDate
 }

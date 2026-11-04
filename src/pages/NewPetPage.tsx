@@ -43,7 +43,7 @@ export default function NewPetPage() {
           Cadastrar pet
         </h1>
         <p className="mb-6 text-sm text-slate-500">
-          Dados basicos por enquanto — foto e detalhes vem depois.
+          Dados básicos por enquanto — foto e detalhes vêm depois.
         </p>
 
         <Card>
@@ -58,7 +58,7 @@ export default function NewPetPage() {
               />
             </Field>
 
-            <Field label="Especie">
+            <Field label="Espécie">
               <select
                 value={species}
                 onChange={(event) => setSpecies(event.target.value as PetSpecies)}
@@ -72,7 +72,7 @@ export default function NewPetPage() {
               </select>
             </Field>
 
-            <Field label="Raca" hint="Opcional">
+            <Field label="Raça" hint="Opcional">
               <input
                 value={breed}
                 onChange={(event) => setBreed(event.target.value)}

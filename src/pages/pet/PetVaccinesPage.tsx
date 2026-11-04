@@ -9,7 +9,16 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { Spinner } from '@/components/ui/Spinner'
 import { VaccineStatusBadge } from '@/features/vaccines/components/VaccineStatusBadge'
 import { useCreateVaccine, useVaccines } from '@/features/vaccines/queries'
-import { byNextDueAsc, describeDueDate, getVaccineStatus } from '@/features/vaccines/types'
+import {
+  byNextDueAsc,
+  describeDueDate,
+  describeKind,
+  getOpenDueRecords,
+  getVaccineStatus,
+  vaccineKindLabel,
+  vaccineKinds,
+  type VaccineKind,
+} from '@/features/vaccines/types'
 import { today } from '@/lib/date'
 import { formatDate } from '@/lib/utils'
 
@@ -19,6 +28,7 @@ export default function PetVaccinesPage() {
   const createVaccine = useCreateVaccine(petId)
 
   const [isFormOpen, setFormOpen] = useState(false)
+  const [kind, setKind] = useState<VaccineKind>('vaccine')
   const [name, setName] = useState('')
   const [date, setDate] = useState(today())
   const [nextDueDate, setNextDueDate] = useState('')
@@ -28,17 +38,15 @@ export default function PetVaccinesPage() {
 
   const list = useMemo(() => records ?? [], [records])
 
-  /** Reforcos: so o que tem data marcada, do mais urgente para o mais distante. */
-  const upcoming = useMemo(
-    () => list.filter((record) => record.nextDueDate).sort(byNextDueAsc),
-    [list],
-  )
+  /** Prazos: so o que tem data marcada e nao foi renovado, do mais urgente ao mais distante. */
+  const upcoming = useMemo(() => getOpenDueRecords(list).sort(byNextDueAsc), [list])
 
   const overdueCount = upcoming.filter((record) => getVaccineStatus(record) === 'overdue').length
   const dueSoonCount = upcoming.filter((record) => getVaccineStatus(record) === 'due-soon').length
 
   function closeForm() {
     setFormOpen(false)
+    setKind('vaccine')
     setName('')
     setDate(today())
     setNextDueDate('')
@@ -54,6 +62,7 @@ export default function PetVaccinesPage() {
 
     await createVaccine.mutateAsync({
       petId,
+      kind,
       name: name.trim(),
       date,
       nextDueDate: nextDueDate || undefined,
@@ -76,32 +85,50 @@ export default function PetVaccinesPage() {
   return (
     <>
       <PageHeader
-        title="Vacinas"
-        description="Carteira de vacinacao do pet."
-        actions={<Button onClick={() => setFormOpen(true)}>Registrar vacina</Button>}
+        title="Vacinas e preventivos"
+        description="Vacinas, vermífugos e antipulgas do pet."
+        actions={<Button onClick={() => setFormOpen(true)}>Registrar cuidado</Button>}
       />
 
       <Modal
         open={isFormOpen}
         onClose={closeForm}
-        title="Registrar vacina"
-        description="O proximo reforco e a data que o veterinario passou — o app nao calcula intervalo."
+        title="Registrar cuidado preventivo"
+        description="A próxima aplicação é a data que o veterinário passou — o app não calcula intervalo."
       >
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <Field label="Vacina">
-              <input
-                required
-                autoFocus
-                placeholder="Ex.: Antirrabica"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className={inputClass}
-              />
-            </Field>
-          </div>
+          <Field label="Tipo">
+            <select
+              value={kind}
+              onChange={(event) => setKind(event.target.value as VaccineKind)}
+              className={inputClass}
+            >
+              {vaccineKinds.map((value) => (
+                <option key={value} value={value}>
+                  {vaccineKindLabel[value]}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-          <Field label="Data da aplicacao">
+          <Field label="Nome">
+            <input
+              required
+              autoFocus
+              placeholder={
+                kind === 'vaccine'
+                  ? 'Ex.: Antirrábica'
+                  : kind === 'dewormer'
+                    ? 'Ex.: Vermífugo'
+                    : 'Ex.: Antipulgas'
+              }
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="Data da aplicação">
             <input
               required
               type="date"
@@ -112,7 +139,7 @@ export default function PetVaccinesPage() {
             />
           </Field>
 
-          <Field label="Proximo reforco" hint="Opcional">
+          <Field label="Próxima aplicação" hint="Opcional">
             <input
               type="date"
               value={nextDueDate}
@@ -121,7 +148,7 @@ export default function PetVaccinesPage() {
             />
           </Field>
 
-          <Field label="Veterinario ou clinica" hint="Opcional">
+          <Field label="Veterinário ou clínica" hint="Opcional">
             <input
               value={vet}
               onChange={(event) => setVet(event.target.value)}
@@ -138,7 +165,7 @@ export default function PetVaccinesPage() {
           </Field>
 
           <div className="sm:col-span-2">
-            <Field label="Observacoes" hint="Opcional">
+            <Field label="Observações" hint="Opcional">
               <input
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
@@ -148,7 +175,9 @@ export default function PetVaccinesPage() {
           </div>
 
           {createVaccine.isError && (
-            <p className="text-sm text-red-600 sm:col-span-2">Não foi possível salvar a vacina.</p>
+            <p className="text-sm text-red-600 sm:col-span-2">
+              Não foi possível salvar o registro.
+            </p>
           )}
 
           <div className="flex justify-end gap-2 sm:col-span-2">
@@ -164,9 +193,9 @@ export default function PetVaccinesPage() {
 
       {list.length === 0 ? (
         <Card className="max-w-2xl">
-          <p className="text-sm font-medium text-slate-700">Nenhuma vacina registrada</p>
+          <p className="text-sm font-medium text-slate-700">Nenhum cuidado preventivo registrado</p>
           <p className="mt-1 text-sm text-slate-500">
-            Registre a primeira aplicacao para montar a carteira de vacinacao.
+            Registre a primeira aplicação para montar a carteira de vacinas e preventivos.
           </p>
         </Card>
       ) : (
@@ -182,18 +211,18 @@ export default function PetVaccinesPage() {
                 {overdueCount}
               </p>
               <p className="mt-1 text-xs text-slate-500">
-                {overdueCount === 0 ? 'nenhum reforco vencido' : 'reforco(s) ja vencido(s)'}
+                {overdueCount === 0 ? 'nenhum prazo vencido' : 'prazo(s) já vencido(s)'}
               </p>
             </Card>
 
             <Card>
-              <CardTitle>Proximos 30 dias</CardTitle>
+              <CardTitle>Próximos 30 dias</CardTitle>
               <p className="mt-2 text-3xl font-semibold text-slate-900">{dueSoonCount}</p>
-              <p className="mt-1 text-xs text-slate-500">reforco(s) chegando</p>
+              <p className="mt-1 text-xs text-slate-500">prazo(s) chegando</p>
             </Card>
 
             <Card>
-              <CardTitle>Aplicacoes</CardTitle>
+              <CardTitle>Registros</CardTitle>
               <p className="mt-2 text-3xl font-semibold text-slate-900">{list.length}</p>
               <p className="mt-1 text-xs text-slate-500">
                 desde {formatDate(list[list.length - 1].date)}
@@ -203,7 +232,7 @@ export default function PetVaccinesPage() {
 
           {upcoming.length > 0 && (
             <Card>
-              <CardTitle>Proximos reforcos</CardTitle>
+              <CardTitle>Próximas aplicações</CardTitle>
               <ul className="mt-3 flex flex-col divide-y divide-slate-100">
                 {upcoming.map((record) => {
                   const status = getVaccineStatus(record)
@@ -215,7 +244,13 @@ export default function PetVaccinesPage() {
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-slate-900">{record.name}</p>
                         <p className="text-xs text-slate-500">
-                          {formatDate(record.nextDueDate!)} · {describeDueDate(record.nextDueDate!)}
+                          {[
+                            describeKind(record),
+                            formatDate(record.nextDueDate!),
+                            describeDueDate(record.nextDueDate!),
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
                         </p>
                       </div>
                       <VaccineStatusBadge status={status} />
@@ -227,16 +262,17 @@ export default function PetVaccinesPage() {
           )}
 
           <Card>
-            <CardTitle>Historico de aplicacoes</CardTitle>
+            <CardTitle>Histórico de aplicações</CardTitle>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
                     <th className="pb-2 font-medium">Data</th>
-                    <th className="pb-2 font-medium">Vacina</th>
-                    <th className="pb-2 font-medium">Veterinario</th>
+                    <th className="pb-2 font-medium">Cuidado</th>
+                    <th className="pb-2 font-medium">Tipo</th>
+                    <th className="pb-2 font-medium">Veterinário</th>
                     <th className="pb-2 font-medium">Lote</th>
-                    <th className="pb-2 font-medium">Proximo reforco</th>
+                    <th className="pb-2 font-medium">Próxima aplicação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -253,6 +289,7 @@ export default function PetVaccinesPage() {
                           </span>
                         )}
                       </td>
+                      <td className="py-2 text-slate-500">{vaccineKindLabel[record.kind]}</td>
                       <td className="py-2 text-slate-500">{record.vet ?? '—'}</td>
                       <td className="py-2 text-slate-500">{record.batch ?? '—'}</td>
                       <td className="py-2 whitespace-nowrap text-slate-500">

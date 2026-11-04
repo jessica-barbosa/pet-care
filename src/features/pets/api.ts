@@ -58,10 +58,10 @@ const MOCK_PETS: Pet[] = [
     id: '2',
     name: 'Mia',
     species: 'cat',
-    breed: 'Siames',
+    breed: 'Siamês',
     birthDate: '2019-11-02',
     ownerName: 'Carlos Lima',
-    notes: 'Alergia a racao com frango.',
+    notes: 'Alergia a ração com frango.',
   },
   {
     id: '3',
@@ -84,7 +84,7 @@ const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
  */
 function replaceMockPet(id: string, patch: Partial<Pet>): Pet {
   const index = MOCK_PETS.findIndex((item) => item.id === id)
-  if (index < 0) throw new Error(`Pet ${id} nao encontrado`)
+  if (index < 0) throw new Error(`Pet ${id} não encontrado`)
 
   MOCK_PETS[index] = { ...MOCK_PETS[index], ...patch }
   return MOCK_PETS[index]

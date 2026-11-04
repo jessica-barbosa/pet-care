@@ -72,7 +72,7 @@ const MOCK_APPOINTMENTS: Appointment[] = [
     time: '10:30',
     reason: 'Retorno - controle de peso',
     vet: 'Dra. Helena Prado',
-    clinic: 'Clinica VetSul',
+    clinic: 'Clínica VetSul',
     status: 'scheduled',
   },
   {
@@ -82,37 +82,37 @@ const MOCK_APPOINTMENTS: Appointment[] = [
     time: '09:00',
     reason: 'Consulta de rotina',
     vet: 'Dra. Helena Prado',
-    clinic: 'Clinica VetSul',
+    clinic: 'Clínica VetSul',
     status: 'done',
-    diagnosis: 'Sobrepeso leve. Exame fisico sem outras alteracoes.',
-    prescription: 'Racao de controle calorico e caminhada diaria de 30 min.',
+    diagnosis: 'Sobrepeso leve. Exame físico sem outras alterações.',
+    prescription: 'Ração de controle calórico e caminhada diária de 30 min.',
   },
   {
     id: 'a3',
     petId: '1',
     date: daysFromNow(-120),
-    reason: 'Check-up e vacinacao',
+    reason: 'Check-up e vacinação',
     vet: 'Dr. Marcos Ferraz',
-    clinic: 'Clinica VetSul',
+    clinic: 'Clínica VetSul',
     status: 'done',
-    diagnosis: 'Exame fisico normal.',
+    diagnosis: 'Exame físico normal.',
   },
   {
     id: 'a4',
     petId: '1',
     date: daysFromNow(-200),
     time: '14:00',
-    reason: 'Avaliacao ortopedica',
-    clinic: 'Clinica VetSul',
+    reason: 'Avaliação ortopédica',
+    clinic: 'Clínica VetSul',
     status: 'cancelled',
-    notes: 'Desmarcada pela clinica.',
+    notes: 'Desmarcada pela clínica.',
   },
   {
     id: 'a5',
     petId: '2',
     date: daysFromNow(3),
     time: '15:00',
-    reason: 'Avaliacao dermatologica',
+    reason: 'Avaliação dermatológica',
     vet: 'Dra. Helena Prado',
     status: 'scheduled',
   },
@@ -120,11 +120,11 @@ const MOCK_APPOINTMENTS: Appointment[] = [
     id: 'a6',
     petId: '2',
     date: daysFromNow(-90),
-    reason: 'Cocaira e queda de pelo',
+    reason: 'Coceira e queda de pelo',
     vet: 'Dra. Helena Prado',
     status: 'done',
-    diagnosis: 'Reacao alimentar a proteina de frango.',
-    prescription: 'Racao hipoalergenica sem frango por 60 dias.',
+    diagnosis: 'Reação alimentar à proteína de frango.',
+    prescription: 'Ração hipoalergênica sem frango por 60 dias.',
   },
 ]
 
@@ -171,7 +171,7 @@ export async function updateAppointment({ id, ...patch }: AppointmentUpdate) {
   if (!supabase) {
     await delay(400)
     const index = MOCK_APPOINTMENTS.findIndex((item) => item.id === id)
-    if (index < 0) throw new Error(`Consulta ${id} nao encontrada`)
+    if (index < 0) throw new Error(`Consulta ${id} não encontrada`)
     MOCK_APPOINTMENTS[index] = { ...MOCK_APPOINTMENTS[index], ...patch }
     return MOCK_APPOINTMENTS[index]
   }
