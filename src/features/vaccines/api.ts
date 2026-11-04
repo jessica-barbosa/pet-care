@@ -1,4 +1,4 @@
-import type { NewVaccineRecord, VaccineRecord } from '@/features/vaccines/types'
+import type { NewVaccineRecord, VaccineKind, VaccineRecord } from '@/features/vaccines/types'
 import { byDateDesc } from '@/features/vaccines/types'
 import { toDateInput } from '@/lib/date'
 import { requireSupabase, supabase } from '@/lib/supabase'
@@ -16,6 +16,7 @@ function toRecord(row: Tables<'vaccines'>): VaccineRecord {
   return {
     id: row.id,
     petId: row.pet_id,
+    kind: row.kind as VaccineKind,
     name: row.name,
     date: row.date,
     nextDueDate: row.next_due_date ?? undefined,
@@ -28,6 +29,7 @@ function toRecord(row: Tables<'vaccines'>): VaccineRecord {
 function toRow(record: NewVaccineRecord): TablesInsert<'vaccines'> {
   return {
     pet_id: record.petId,
+    kind: record.kind,
     name: record.name,
     date: record.date,
     next_due_date: record.nextDueDate ?? null,
@@ -49,31 +51,35 @@ const daysFromNow = (days: number) => {
 }
 
 /**
- * Thor cobre os quatro status (atraso, chegando, em dia, sem reforco); Mia tem
- * duas aplicacoes; Bidu nao tem nenhuma (estado vazio).
+ * Thor cobre os quatro status (atraso, chegando, em dia, sem data) e os tres tipos
+ * (vacina, vermifugo, antipulgas); Mia tem duas aplicacoes; Bidu nao tem nenhuma
+ * (estado vazio).
  */
 const MOCK_VACCINES: VaccineRecord[] = [
   {
     id: 'v1',
     petId: '1',
-    name: 'Antirrabica',
+    kind: 'vaccine',
+    name: 'Antirrábica',
     date: daysFromNow(-380),
     nextDueDate: daysFromNow(-15),
-    vet: 'Clinica VetSul',
+    vet: 'Clínica VetSul',
     batch: 'ARB-2251',
   },
   {
     id: 'v2',
     petId: '1',
-    name: 'V10 (multipla canina)',
+    kind: 'vaccine',
+    name: 'V10 (múltipla canina)',
     date: daysFromNow(-347),
     nextDueDate: daysFromNow(18),
-    vet: 'Clinica VetSul',
+    vet: 'Clínica VetSul',
     batch: 'V10-8830',
   },
   {
     id: 'v3',
     petId: '1',
+    kind: 'vaccine',
     name: 'Gripe canina',
     date: daysFromNow(-120),
     nextDueDate: daysFromNow(245),
@@ -82,14 +88,33 @@ const MOCK_VACCINES: VaccineRecord[] = [
   {
     id: 'v4',
     petId: '1',
-    name: 'Giardia',
+    kind: 'vaccine',
+    name: 'Giárdia',
     date: daysFromNow(-200),
-    notes: 'Dose unica combinada com o check-up.',
+    notes: 'Dose única combinada com o check-up.',
+  },
+  {
+    id: 'v7',
+    petId: '1',
+    kind: 'dewormer',
+    name: 'Vermífugo',
+    date: daysFromNow(-96),
+    nextDueDate: daysFromNow(-6),
+    vet: 'Dra. Helena Prado',
+  },
+  {
+    id: 'v8',
+    petId: '1',
+    kind: 'flea_tick',
+    name: 'Antipulgas e carrapatos',
+    date: daysFromNow(-25),
+    nextDueDate: daysFromNow(5),
   },
   {
     id: 'v5',
     petId: '2',
-    name: 'V4 (quadrupla felina)',
+    kind: 'vaccine',
+    name: 'V4 (quádrupla felina)',
     date: daysFromNow(-298),
     nextDueDate: daysFromNow(62),
     vet: 'Dra. Helena Prado',
@@ -98,7 +123,8 @@ const MOCK_VACCINES: VaccineRecord[] = [
   {
     id: 'v6',
     petId: '2',
-    name: 'Antirrabica',
+    kind: 'vaccine',
+    name: 'Antirrábica',
     date: daysFromNow(-298),
     nextDueDate: daysFromNow(3),
     vet: 'Dra. Helena Prado',

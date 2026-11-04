@@ -71,7 +71,7 @@ export default function PetWeightPage() {
         open={isFormOpen}
         onClose={closeForm}
         title="Registrar pesagem"
-        description="A pesagem entra no historico e no grafico de evolucao."
+        description="A pesagem entra no histórico e no gráfico de evolução."
       >
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
           <Field label="Data">
@@ -98,7 +98,7 @@ export default function PetWeightPage() {
           </Field>
 
           <div className="sm:col-span-2">
-            <Field label="Observacoes" hint="Opcional">
+            <Field label="Observações" hint="Opcional">
               <input
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
@@ -126,7 +126,7 @@ export default function PetWeightPage() {
         <Card className="max-w-2xl">
           <p className="text-sm font-medium text-slate-700">Nenhuma pesagem registrada</p>
           <p className="mt-1 text-sm text-slate-500">
-            Registre a primeira pesagem para comecar a acompanhar a evolucao do peso.
+            Registre a primeira pesagem para começar a acompanhar a evolução do peso.
           </p>
         </Card>
       ) : (
@@ -141,7 +141,7 @@ export default function PetWeightPage() {
             </Card>
 
             <Card>
-              <CardTitle>Variacao</CardTitle>
+              <CardTitle>Variação</CardTitle>
               {trend ? (
                 <>
                   <p className="mt-2 text-3xl font-semibold text-slate-900">
@@ -150,7 +150,7 @@ export default function PetWeightPage() {
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
                     {trend.direction === 'stable'
-                      ? 'estavel desde a anterior'
+                      ? 'estável desde a anterior'
                       : `${trend.direction === 'up' ? 'acima' : 'abaixo'} da pesagem anterior`}
                   </p>
                 </>
@@ -172,15 +172,15 @@ export default function PetWeightPage() {
           </div>
 
           <Card>
-            <CardTitle>Evolucao do peso</CardTitle>
+            <CardTitle>Evolução do peso</CardTitle>
             {list.length === 1 ? (
               <p className="mt-2 text-sm text-slate-500">
-                Com uma unica pesagem ainda nao ha evolucao para desenhar — registre outra para ver
+                Com uma única pesagem ainda não há evolução para desenhar — registre outra para ver
                 a curva.
               </p>
             ) : (
               <p className="mt-1 text-xs text-slate-500">
-                Passe o mouse (ou use Tab) sobre o grafico para ver cada pesagem.
+                Passe o mouse (ou use Tab) sobre o gráfico para ver cada pesagem.
               </p>
             )}
             <div className="mt-4">
@@ -189,14 +189,14 @@ export default function PetWeightPage() {
           </Card>
 
           <Card>
-            <CardTitle>Historico de pesagens</CardTitle>
+            <CardTitle>Histórico de pesagens</CardTitle>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
                     <th className="pb-2 font-medium">Data</th>
                     <th className="pb-2 font-medium">Peso</th>
-                    <th className="pb-2 font-medium">Observacoes</th>
+                    <th className="pb-2 font-medium">Observações</th>
                   </tr>
                 </thead>
                 <tbody>

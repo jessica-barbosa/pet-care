@@ -98,7 +98,7 @@ export function WeightChart({ entries }: { entries: WeightEntry[] }) {
         viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
         className="w-full touch-none"
         role="img"
-        aria-label={`Evolucao do peso em ${series.length} ${series.length === 1 ? 'pesagem' : 'pesagens'}`}
+        aria-label={`Evolução do peso em ${series.length} ${series.length === 1 ? 'pesagem' : 'pesagens'}`}
         onPointerLeave={() => setActiveIndex(null)}
       >
         <defs>

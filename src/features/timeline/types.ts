@@ -5,7 +5,7 @@
  * filtram e desenham diferente (calendario x linha do tempo). Qualquer dominio
  * novo entra aqui e aparece nas duas telas sem tocar em nenhuma delas.
  */
-export type EventKind = 'weight' | 'vaccine' | 'appointment'
+export type EventKind = 'weight' | 'vaccine' | 'appointment' | 'medication' | 'exam'
 
 export type TimelineEvent = {
   /** Prefixado pela origem: ids de dominios diferentes podem coincidir. */
@@ -23,8 +23,10 @@ export type TimelineEvent = {
 
 export const eventKindLabel: Record<EventKind, string> = {
   weight: 'Peso',
-  vaccine: 'Vacina',
+  vaccine: 'Preventivo',
   appointment: 'Consulta',
+  medication: 'Medicamento',
+  exam: 'Exame',
 }
 
 /**
@@ -36,12 +38,16 @@ export const eventKindColor: Record<EventKind, string> = {
   weight: 'bg-teal-500',
   vaccine: 'bg-violet-500',
   appointment: 'bg-sky-500',
+  medication: 'bg-amber-500',
+  exam: 'bg-rose-500',
 }
 
 export const eventKindTextColor: Record<EventKind, string> = {
   weight: 'text-teal-700',
   vaccine: 'text-violet-700',
   appointment: 'text-sky-700',
+  medication: 'text-amber-700',
+  exam: 'text-rose-700',
 }
 
 /** Mais recente primeiro (historico). */

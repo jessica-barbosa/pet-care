@@ -91,6 +91,7 @@ export type Database = {
           vet: string | null
           batch: string | null
           notes: string | null
+          kind: string
           created_at: string
         }
         Insert: {
@@ -98,6 +99,7 @@ export type Database = {
           pet_id: string
           name: string
           date: string
+          kind?: string
           next_due_date?: string | null
           vet?: string | null
           batch?: string | null
@@ -109,9 +111,91 @@ export type Database = {
           pet_id?: string
           name?: string
           date?: string
+          kind?: string
           next_due_date?: string | null
           vet?: string | null
           batch?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      exams: {
+        Row: {
+          id: string
+          pet_id: string
+          date: string
+          title: string
+          lab: string | null
+          notes: string | null
+          file_path: string
+          file_name: string
+          mime_type: string
+          size_bytes: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          pet_id: string
+          date: string
+          title: string
+          lab?: string | null
+          notes?: string | null
+          file_path: string
+          file_name: string
+          mime_type: string
+          size_bytes?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          pet_id?: string
+          date?: string
+          title?: string
+          lab?: string | null
+          notes?: string | null
+          file_path?: string
+          file_name?: string
+          mime_type?: string
+          size_bytes?: number | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      medications: {
+        Row: {
+          id: string
+          pet_id: string
+          name: string
+          dose: string | null
+          frequency: string | null
+          start_date: string
+          end_date: string | null
+          vet: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          pet_id: string
+          name: string
+          dose?: string | null
+          frequency?: string | null
+          start_date: string
+          end_date?: string | null
+          vet?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          pet_id?: string
+          name?: string
+          dose?: string | null
+          frequency?: string | null
+          start_date?: string
+          end_date?: string | null
+          vet?: string | null
           notes?: string | null
           created_at?: string
         }

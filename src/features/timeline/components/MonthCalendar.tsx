@@ -2,7 +2,7 @@ import { eventKindColor, type TimelineEvent } from '@/features/timeline/types'
 import { dateKey, daysInMonth, firstWeekday } from '@/lib/date'
 import { cn } from '@/lib/utils'
 
-const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
+const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 /** Mais que isso vira sujeira na celula; o resto conta no "+N". */
 const MAX_DOTS = 3

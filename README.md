@@ -63,6 +63,8 @@ perfis do Netflix) e todas as secoes vivem dentro do contexto dele.
 | `/pets/:petId/peso`       | PetWeightPage        | PetLayout         |
 | `/pets/:petId/consultas`  | PetAppointmentsPage  | PetLayout         |
 | `/pets/:petId/vacinas`    | PetVaccinesPage      | PetLayout         |
+| `/pets/:petId/medicamentos` | PetMedicationsPage | PetLayout         |
+| `/pets/:petId/exames`     | PetExamsPage         | PetLayout         |
 | `/pets/:petId/historico`  | PetHistoryPage       | PetLayout         |
 | `*`                       | NotFoundPage         | tela cheia        |
 
@@ -79,8 +81,8 @@ existir, a foto entra no lugar sem mexer no layout.
 
 ### Dominios e views
 
-Tres dominios tem dados proprios, no mesmo padrao (`types.ts` → `api.ts` → `queries.ts`):
-**weights**, **vaccines** e **appointments**.
+Cinco dominios tem dados proprios, no mesmo padrao (`types.ts` → `api.ts` → `queries.ts`):
+**weights**, **vaccines**, **appointments**, **medications** e **exams**.
 
 Agenda, Historico e os cards da Visao geral **nao tem dados proprios**. As duas primeiras
 leem `features/timeline/useTimeline`, que junta os tres dominios numa lista de
@@ -131,6 +133,43 @@ atraves de `pets`.
 As regras de produto estao no banco, nao so na interface: `weights` e `vaccines` tem
 policy apenas de SELECT e INSERT (registro historico nao se altera), e `appointments`
 ganha UPDATE porque recebe o desfecho depois — nenhuma das tres aceita DELETE.
+
+### Preventivos, medicamentos, exames e pendencias
+
+Migrations [`0004`](supabase/migrations/0004_preventives_medications.sql) e
+[`0005`](supabase/migrations/0005_exams.sql), **nessa ordem**.
+
+- **Vermifugo e antipulgas** nao tem tabela propria: sao `vaccines` com um `kind`
+  (`vaccine`, `dewormer`, `flea_tick`). Tem o mesmo formato de uma vacina (o que foi,
+  quando, proxima data digitada) e reaproveitam as policies da 0001. Linhas antigas viram
+  `vaccine`. A tela continua em `/vacinas`, mas o titulo e "Vacinas e preventivos".
+- **Prazo renovado**: uma aplicacao mais recente do mesmo cuidado (mesmo tipo e nome, sem
+  diferenciar acento nem maiuscula) substitui a data prevista da anterior
+  (`isSuperseded` em `features/vaccines/types.ts`). Sem isso, uma antirrabica vencida
+  ficaria "em atraso" para sempre, mesmo depois de registrar a dose nova.
+- **Medicamentos**: `medications`, com dose e frequencia em texto livre (o app nao calcula
+  posologia). `end_date` vazio = uso continuo. Nao tem DELETE, e o UPDATE so alcanca
+  `end_date` (grant por coluna): o unico gesto depois de registrar e "Encerrar". A data de
+  termino de hoje em diante ja conta como "Concluido".
+- **Exames**: `exams` + bucket **privado** `pet-exams`. O banco guarda so o caminho; a
+  listagem pede links assinados de 1 hora (`createSignedUrls`). PDF/JPG/PNG/WebP, ate 10 MB.
+  Tem DELETE (um envio errado nao tem outra correcao), mas nao UPDATE. Caminho
+  `exams/{pet_id}-{uuid}.{ext}`, com a mesma tecnica de policy das fotos.
+- **Pendencias** (`features/pendencies`): nao e notificacao — o aviso aparece quando o app
+  esta aberto (visao geral e selo na selecao de pets). Vem so das datas digitadas:
+  preventivos vencidos ou nos proximos 30 dias, consultas agendadas ate 7 dias a frente (ou
+  que ja passaram sem registro) e tratamentos que terminam em ate 3 dias. Notificacao por
+  e-mail ou celular exigiria um job no servidor e nao existe.
+
+**Ordem para publicar** (as migrations sao compativeis com o codigo antigo, entao o SQL
+sempre vem primeiro):
+
+1. No SQL Editor do Supabase, rodar a `0004` e depois a `0005`.
+2. Conferir em Storage que o bucket `pet-exams` existe e esta como **privado**.
+3. Mergear na `main` (a Vercel publica sozinha).
+4. Com uma conta de teste: registrar um vermifugo, um medicamento e enviar, abrir e remover
+   um exame. Se o envio de exame falhar com "violates row-level security policy", as
+   policies de Storage da `0005` precisam de ajuste — as demais telas nao dependem delas.
 
 ### Fotos dos pets (Storage)
 

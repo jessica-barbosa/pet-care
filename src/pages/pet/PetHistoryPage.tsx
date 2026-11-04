@@ -19,7 +19,9 @@ import { cn, formatDate } from '@/lib/utils'
 const filters: Array<{ value: EventKind | 'all'; label: string }> = [
   { value: 'all', label: 'Tudo' },
   { value: 'appointment', label: 'Consultas' },
-  { value: 'vaccine', label: 'Vacinas' },
+  { value: 'vaccine', label: 'Preventivos' },
+  { value: 'medication', label: 'Medicamentos' },
+  { value: 'exam', label: 'Exames' },
   { value: 'weight', label: 'Peso' },
 ]
 
@@ -80,8 +82,8 @@ export default function PetHistoryPage() {
   return (
     <>
       <PageHeader
-        title="Historico"
-        description="Tudo que ja aconteceu com o pet, das tres secoes, em ordem."
+        title="Histórico"
+        description="Tudo o que já aconteceu com o pet, de todas as seções, em ordem."
       />
 
       {past.length === 0 ? (
@@ -123,7 +125,7 @@ export default function PetHistoryPage() {
           {groups.length === 0 ? (
             <Card className="max-w-2xl">
               <p className="text-sm text-slate-600">
-                Nenhum registro desse tipo no historico deste pet.
+                Nenhum registro desse tipo no histórico deste pet.
               </p>
             </Card>
           ) : (
@@ -153,7 +155,7 @@ export default function PetHistoryPage() {
                           </span>
                           <span className="text-xs text-slate-400">
                             {formatDate(event.date)}
-                            {event.time ? ` as ${event.time}` : ''}
+                            {event.time ? ` às ${event.time}` : ''}
                           </span>
                         </div>
 

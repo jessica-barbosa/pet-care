@@ -4,11 +4,12 @@ import { Card, CardTitle } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { useAppointments } from '@/features/appointments/queries'
 import { byDateTimeAsc, describeWhen } from '@/features/appointments/types'
+import { PendingList } from '@/features/pendencies/components/PendingList'
 import { PetAvatar } from '@/features/pets/components/PetAvatar'
 import { useCurrentPet } from '@/features/pets/queries'
 import { speciesLabel } from '@/features/pets/types'
 import { useVaccines } from '@/features/vaccines/queries'
-import { getVaccineStatus } from '@/features/vaccines/types'
+import { getOpenDueRecords, getVaccineStatus } from '@/features/vaccines/types'
 import { formatWeight } from '@/features/weights/types'
 import { useWeights } from '@/features/weights/queries'
 import { cn, formatDate, formatDateShort } from '@/lib/utils'
@@ -74,8 +75,8 @@ export default function PetOverviewPage() {
     .filter((item) => item.status === 'scheduled')
     .sort(byDateTimeAsc)[0]
 
-  // "Pendente" = reforco vencido ou chegando nos proximos 30 dias.
-  const pendingVaccines = vaccines.filter((record) => {
+  // "Pendente" = reforco vencido ou chegando nos próximos 30 dias.
+  const pendingVaccines = getOpenDueRecords(vaccines).filter((record) => {
     const status = getVaccineStatus(record)
     return status === 'overdue' || status === 'due-soon'
   })
@@ -84,15 +85,19 @@ export default function PetOverviewPage() {
   ).length
 
   const fields = [
-    { label: 'Especie', value: speciesLabel[pet.species] },
-    { label: 'Raca', value: pet.breed ?? '—' },
+    { label: 'Espécie', value: speciesLabel[pet.species] },
+    { label: 'Raça', value: pet.breed ?? '—' },
     { label: 'Nascimento', value: pet.birthDate ? formatDate(pet.birthDate) : '—' },
     { label: 'Tutor', value: pet.ownerName ?? '—' },
   ]
 
   return (
     <>
-      <PageHeader title="Visao geral" description={`Resumo do cuidado com ${pet.name}.`} />
+      <PageHeader title="Visão geral" description={`Resumo do cuidado com ${pet.name}.`} />
+
+      <div className="mb-4">
+        <PendingList petId={petId} />
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">
@@ -100,7 +105,7 @@ export default function PetOverviewPage() {
             <PetAvatar pet={pet} size="md" />
             <div className="min-w-0">
               <p className="truncate font-semibold text-slate-900">{pet.name}</p>
-              <p className="text-xs text-slate-500">{pet.notes ?? 'Sem observacoes.'}</p>
+              <p className="text-xs text-slate-500">{pet.notes ?? 'Sem observações.'}</p>
             </div>
           </div>
 
@@ -116,7 +121,7 @@ export default function PetOverviewPage() {
 
         <div className="grid gap-4 sm:grid-cols-3 lg:col-span-2 lg:auto-rows-min">
           <StatCard
-            title="Proxima consulta"
+            title="Próxima consulta"
             to={`/pets/${petId}/consultas`}
             loading={loadingAppointments}
             compact
@@ -139,7 +144,7 @@ export default function PetOverviewPage() {
           />
 
           <StatCard
-            title="Vacinas pendentes"
+            title="Preventivos pendentes"
             to={`/pets/${petId}/vacinas`}
             loading={loadingVaccines}
             tone={overdueCount > 0 ? 'alert' : 'default'}
@@ -148,8 +153,8 @@ export default function PetOverviewPage() {
               overdueCount > 0
                 ? `${overdueCount} em atraso`
                 : pendingVaccines.length > 0
-                  ? 'nos proximos 30 dias'
-                  : 'nenhum reforco proximo'
+                  ? 'nos próximos 30 dias'
+                  : 'nenhum reforço próximo'
             }
           />
         </div>

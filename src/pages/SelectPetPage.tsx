@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { MockBanner } from '@/components/ui/MockBanner'
 import { Spinner } from '@/components/ui/Spinner'
 import { useAuth } from '@/features/auth/useAuth'
+import { PendingBadge, PendingText } from '@/features/pendencies/components/PendingBadge'
 import { PetAvatar } from '@/features/pets/components/PetAvatar'
 import { usePets } from '@/features/pets/queries'
 import { speciesLabel } from '@/features/pets/types'
@@ -55,16 +56,20 @@ export default function SelectPetPage() {
                   to={`/pets/${pet.id}`}
                   className="group flex w-32 flex-col items-center gap-3 rounded-2xl p-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-400"
                 >
-                  <PetAvatar
-                    pet={pet}
-                    size="lg"
-                    className="transition-transform duration-200 group-hover:scale-105 group-focus-visible:scale-105"
-                  />
+                  <div className="relative">
+                    <PetAvatar
+                      pet={pet}
+                      size="lg"
+                      className="transition-transform duration-200 group-hover:scale-105 group-focus-visible:scale-105"
+                    />
+                    <PendingBadge petId={pet.id} />
+                  </div>
                   <div className="text-center">
                     <p className="font-medium text-slate-200 transition-colors group-hover:text-white">
                       {pet.name}
                     </p>
                     <p className="text-xs text-slate-500">{speciesLabel[pet.species]}</p>
+                    <PendingText petId={pet.id} />
                   </div>
                 </Link>
               </li>

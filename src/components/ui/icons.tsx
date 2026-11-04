@@ -78,6 +78,25 @@ export function SyringeIcon(props: IconProps) {
   )
 }
 
+export function PillIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-35 12 12)" />
+      <path d="M10 9.1 14 14.9" />
+    </Icon>
+  )
+}
+
+export function FileIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+      <path d="M14 3v4h4" />
+      <path d="M9 12h6M9 15.5h6" />
+    </Icon>
+  )
+}
+
 export function CameraIcon(props: IconProps) {
   return (
     <Icon {...props}>

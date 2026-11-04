@@ -8,7 +8,9 @@ import NotFoundPage from '@/pages/NotFoundPage'
 import SelectPetPage from '@/pages/SelectPetPage'
 import PetAgendaPage from '@/pages/pet/PetAgendaPage'
 import PetAppointmentsPage from '@/pages/pet/PetAppointmentsPage'
+import PetExamsPage from '@/pages/pet/PetExamsPage'
 import PetHistoryPage from '@/pages/pet/PetHistoryPage'
+import PetMedicationsPage from '@/pages/pet/PetMedicationsPage'
 import PetOverviewPage from '@/pages/pet/PetOverviewPage'
 import PetVaccinesPage from '@/pages/pet/PetVaccinesPage'
 import PetWeightPage from '@/pages/pet/PetWeightPage'
@@ -31,6 +33,8 @@ export const router = createBrowserRouter([
           { path: 'peso', element: <PetWeightPage /> },
           { path: 'consultas', element: <PetAppointmentsPage /> },
           { path: 'vacinas', element: <PetVaccinesPage /> },
+          { path: 'medicamentos', element: <PetMedicationsPage /> },
+          { path: 'exames', element: <PetExamsPage /> },
           { path: 'historico', element: <PetHistoryPage /> },
         ],
       },
